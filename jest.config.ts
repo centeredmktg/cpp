@@ -2,8 +2,17 @@ import type { Config } from 'jest'
 
 const config: Config = {
   testEnvironment: 'node',
-  transform: { '^.+\\.tsx?$': 'ts-jest' },
-  moduleNameMapper: { '^@/(.*)$': '<rootDir>/$1' },
+  extensionsToTreatAsEsm: ['.ts'],
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      useESM: true,
+      tsconfig: { module: 'ESNext', moduleResolution: 'bundler' },
+    }],
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
   testMatch: ['**/__tests__/**/*.test.ts?(x)'],
 }
 

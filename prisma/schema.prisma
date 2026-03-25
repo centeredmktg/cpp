@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  name        String
+  serviceType ServiceType
+  status      ProjectStatus @default(LEAD)
+  description String?
+  receivedAt  DateTime      @default(now())
+  startDate   DateTime?
+  targetDate  DateTime?
+  completedAt DateTime?
+  revenue     Float?
+  cost        Float?
+  notes       String?
+  hubspotId   String?
+  people      PersonOnProject[]
+  quotes      Quote[]
+}
+
+model Person {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  name      String
+  email     String?
+  phone     String?
+  company   String?
+  hubspotId String?
+  projects  PersonOnProject[]
+}
+
+model PersonOnProject {
+  person    Person     @relation(fields: [personId], references: [id])
+  personId  String
+  project   Project    @relation(fields: [projectId], references: [id])
+  projectId String
+  role      PersonRole
+
+  @@id([personId, projectId])
+}
+
+model Quote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
+  lineItems Json
+  subtotal  Float
+  tax       Float?
+  total     Float
+  notes     String?
+}
+
+model PricingBaseline {
+  id    String @id @default(cuid())
+  key   String @unique
+  label String
+  rate  Float
+  unit  String
+}
+
+model EpoxyRate {
+  id          String @id @default(cuid())
+  jobType     String // Warehouse | Retail | Residential
+  systemLevel String // Standard | Premium | Elite
+  rate        Float
+
+  @@unique([jobType, systemLevel])
+}
+
+enum ServiceType {
+  INTERIOR
+  EXTERIOR
+  EPOXY
+}
+
+enum ProjectStatus {
+  LEAD
+  QUOTED
+  CONTRACTED
+  IN_PROGRESS
+  COMPLETE
+  LOST
+}
+
+enum PersonRole {
+  HOMEOWNER
+  PROPERTY_OWNER
+  PROPERTY_MANAGER
+  GENERAL_CONTRACTOR
+  OTHER
+}
