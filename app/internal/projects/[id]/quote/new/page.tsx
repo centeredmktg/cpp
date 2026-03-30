@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import IntakeDropzone, { type AttachedFile } from '@/app/components/IntakeDropzone'
 
 interface Baseline { key: string; label: string; rate: number; unit: string }
 interface LineItem { label: string; qty: number; unit: string; rate: number; total: number }
 interface EpoxyRate { id: string; jobType: string; systemLevel: string; rate: number }
 
-// Fallback constants — used until DB rates load
 const FALLBACK_RATES: Record<string, Record<string, number>> = {
   Warehouse:   { Standard: 7.5, Premium: 8.5,  Elite: 9.5  },
   Retail:      { Standard: 8.0, Premium: 9.0,  Elite: 10.0 },
@@ -16,6 +16,7 @@ const FALLBACK_RATES: Record<string, Record<string, number>> = {
 
 type JobType = 'Warehouse' | 'Retail' | 'Residential'
 type SystemLevel = 'Standard' | 'Premium' | 'Elite'
+type Market = 'reno_sparks' | 'arrowcreek' | 'tahoe'
 
 const DEFAULT_PROFIT: Record<JobType, number> = {
   Warehouse: 10,
@@ -107,12 +108,12 @@ export default function NewQuotePage() {
   const [serviceType, setServiceType] = useState<'INTERIOR' | 'EXTERIOR' | 'EPOXY'>('INTERIOR')
   const [baselines, setBaselines] = useState<Baseline[]>([])
   const [epoxyRates, setEpoxyRates] = useState<EpoxyRate[]>([])
-  const [measurements, setMeasurements] = useState({
-    wallsSqft: '',
-    ceilingsSqft: '',
-    trimLf: '',
-    exteriorSqft: '',
-  })
+
+  // Freeform intake state
+  const [intakeText, setIntakeText] = useState('')
+  const [intakeFiles, setIntakeFiles] = useState<AttachedFile[]>([])
+  const [market, setMarket] = useState<Market>('reno_sparks')
+
   const [epoxyInputs, setEpoxyInputs] = useState({
     jobType: 'Warehouse' as JobType,
     systemLevel: 'Premium' as SystemLevel,
@@ -135,6 +136,7 @@ export default function NewQuotePage() {
   const [loading, setLoading] = useState(false)
   const [lineItems, setLineItems] = useState<LineItem[]>([])
   const [error, setError] = useState('')
+  const [hadPhotos, setHadPhotos] = useState(false)
 
   useEffect(() => {
     fetch('/api/internal/pricing').then(r => r.json()).then(setBaselines)
@@ -149,6 +151,13 @@ export default function NewQuotePage() {
     setEpoxyInputs(prev => ({ ...prev, jobType, profitPct: String(DEFAULT_PROFIT[jobType]) }))
   }
 
+  function handleStartOver() {
+    setLineItems([])
+    setEpoxyBreakdown(null)
+    setError('')
+    setHadPhotos(false)
+  }
+
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault()
     setError('')
@@ -158,7 +167,6 @@ export default function NewQuotePage() {
     if (serviceType === 'EPOXY') {
       const sqft = parseFloat(epoxyInputs.sqft)
       if (!sqft || sqft <= 0) { setError('Enter a valid square footage.'); return }
-      // Build rate lookup maps from DB records
       const rateLibrary: Record<string, Record<string, number>> = {}
       for (const r of epoxyRates) {
         if (!rateLibrary[r.jobType]) rateLibrary[r.jobType] = {}
@@ -191,12 +199,25 @@ export default function NewQuotePage() {
       return
     }
 
+    // Freeform intake for Interior/Exterior
+    if (!intakeText && intakeFiles.length === 0) {
+      setError('Add some text or photos to generate a quote.')
+      return
+    }
+
     setLoading(true)
+    setHadPhotos(intakeFiles.length > 0)
+
     try {
       const res = await fetch('/api/internal/quote/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ measurements, serviceType, baselines, notes }),
+        body: JSON.stringify({
+          text: intakeText,
+          files: intakeFiles.map(f => ({ name: f.name, type: f.type, data: f.data })),
+          serviceType,
+          market,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
@@ -237,6 +258,7 @@ export default function NewQuotePage() {
   }
 
   const subtotal = lineItems.reduce((s, l) => s + l.total, 0)
+  const isPainting = serviceType === 'INTERIOR' || serviceType === 'EXTERIOR'
 
   return (
     <div className="min-h-screen p-8" style={{ background: '#111110', color: '#fff' }}>
@@ -247,7 +269,7 @@ export default function NewQuotePage() {
             style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#888884', letterSpacing: '0.1em' }}
             className="hover:text-white mb-4 block"
           >
-            ← Back
+            &larr; Back
           </button>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', letterSpacing: '0.03em' }}>
             New Quote
@@ -257,31 +279,48 @@ export default function NewQuotePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left: form */}
           <form onSubmit={handleGenerate} className="flex flex-col gap-5">
-            <div>
-              <label style={labelStyle}>SERVICE TYPE</label>
-              <select
-                value={serviceType}
-                onChange={e => { setServiceType(e.target.value as any); setLineItems([]); setEpoxyBreakdown(null) }}
-                style={{ ...inputStyle, cursor: 'pointer' }}
-              >
-                <option value="INTERIOR">Interior Painting</option>
-                <option value="EXTERIOR">Exterior Painting</option>
-                <option value="EPOXY">Epoxy Floors</option>
-              </select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label style={labelStyle}>SERVICE TYPE</label>
+                <select
+                  value={serviceType}
+                  onChange={e => { setServiceType(e.target.value as any); setLineItems([]); setEpoxyBreakdown(null); setHadPhotos(false) }}
+                  style={{ ...inputStyle, cursor: 'pointer' }}
+                >
+                  <option value="INTERIOR">Interior Painting</option>
+                  <option value="EXTERIOR">Exterior Painting</option>
+                  <option value="EPOXY">Epoxy Floors</option>
+                </select>
+              </div>
+
+              {isPainting && (
+                <div>
+                  <label style={labelStyle}>MARKET</label>
+                  <select
+                    value={market}
+                    onChange={e => setMarket(e.target.value as Market)}
+                    style={{ ...inputStyle, cursor: 'pointer' }}
+                  >
+                    <option value="reno_sparks">Reno / Sparks</option>
+                    <option value="arrowcreek">Arrowcreek</option>
+                    <option value="tahoe">Lake Tahoe</option>
+                  </select>
+                </div>
+              )}
             </div>
 
-            {serviceType === 'INTERIOR' && (
-              <>
-                <Field label="WALLS (SQ FT)" value={measurements.wallsSqft} onChange={v => setMeasurements(m => ({ ...m, wallsSqft: v }))} />
-                <Field label="CEILINGS (SQ FT)" value={measurements.ceilingsSqft} onChange={v => setMeasurements(m => ({ ...m, ceilingsSqft: v }))} />
-                <Field label="TRIM (LINEAL FT)" value={measurements.trimLf} onChange={v => setMeasurements(m => ({ ...m, trimLf: v }))} />
-              </>
+            {/* Freeform intake for painting */}
+            {isPainting && (
+              <IntakeDropzone
+                text={intakeText}
+                onTextChange={setIntakeText}
+                files={intakeFiles}
+                onFilesChange={setIntakeFiles}
+                disabled={loading}
+              />
             )}
 
-            {serviceType === 'EXTERIOR' && (
-              <Field label="EXTERIOR SURFACES (SQ FT)" value={measurements.exteriorSqft} onChange={v => setMeasurements(m => ({ ...m, exteriorSqft: v }))} />
-            )}
-
+            {/* Epoxy inputs — unchanged */}
             {serviceType === 'EPOXY' && (
               <>
                 <div className="grid grid-cols-2 gap-4">
@@ -306,12 +345,12 @@ export default function NewQuotePage() {
                 <Field label="TOTAL SQ FT" value={epoxyInputs.sqft} onChange={v => setEpoxy('sqft', v)} />
 
                 <div>
-                  <label style={labelStyle}>GLUE REMOVAL LEVEL (0–3)</label>
+                  <label style={labelStyle}>GLUE REMOVAL LEVEL (0-3)</label>
                   <select value={epoxyInputs.glueLevel} onChange={e => setEpoxy('glueLevel', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                    <option value="0">0 — None</option>
-                    <option value="1">1 — Light</option>
-                    <option value="2">2 — Moderate</option>
-                    <option value="3">3 — Heavy</option>
+                    <option value="0">0 - None</option>
+                    <option value="1">1 - Light</option>
+                    <option value="2">2 - Moderate</option>
+                    <option value="3">3 - Heavy</option>
                   </select>
                 </div>
 
@@ -348,19 +387,6 @@ export default function NewQuotePage() {
               </>
             )}
 
-            {serviceType !== 'EPOXY' && (
-              <div>
-                <label style={labelStyle}>NOTES / CONTEXT (OPTIONAL)</label>
-                <textarea
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  rows={3}
-                  placeholder="Any special conditions, coats required, etc."
-                  style={{ ...inputStyle, resize: 'vertical' }}
-                />
-              </div>
-            )}
-
             <div>
               <label style={labelStyle}>PAYMENT TERMS</label>
               <textarea
@@ -388,7 +414,11 @@ export default function NewQuotePage() {
               style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.1em', background: '#fff', color: '#000', padding: '0.75rem 1.5rem' }}
               className="hover:bg-zinc-200 transition-colors disabled:opacity-50 self-start uppercase"
             >
-              {serviceType === 'EPOXY' ? 'Calculate Quote →' : loading ? 'Generating...' : 'Generate with Claude →'}
+              {serviceType === 'EPOXY'
+                ? 'Calculate Quote'
+                : loading
+                  ? 'Generating...'
+                  : 'Generate Quote'}
             </button>
 
             {error && (
@@ -422,22 +452,37 @@ export default function NewQuotePage() {
                       ))}
                     </div>
                   )})}
-
                 </div>
               </>
             ) : (
               <>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.12em', marginBottom: '1rem' }}>
-                  CURRENT PRICING BASELINE
+                  PRICING QUICK REFERENCE
                 </p>
                 <div style={{ border: '1px solid #2a2a28' }}>
-                  {baselines.map(b => (
-                    <div key={b.key} className="flex justify-between p-3" style={{ borderBottom: '1px solid #2a2a28' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#888884' }}>{b.label}</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#fff' }}>${b.rate.toFixed(2)}/{b.unit}</span>
+                  <div className="p-3" style={{ borderBottom: '1px solid #2a2a28' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#555552', letterSpacing: '0.1em' }}>MARKET</span>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#fff', marginTop: '4px' }}>
+                      {market === 'reno_sparks' ? 'Reno / Sparks' : market === 'arrowcreek' ? 'Arrowcreek (+50%)' : 'Lake Tahoe (+50%)'}
+                    </p>
+                  </div>
+                  {[
+                    ['Walls + Ceiling', market === 'reno_sparks' ? '$2.50\u2013$3.00/sqft' : '$3.75\u2013$4.50/sqft'],
+                    ['Trim', market === 'reno_sparks' ? '$1.00/lnft' : '$1.50/lnft'],
+                    ['Crown', market === 'reno_sparks' ? '$5.00/lnft' : '$7.50/lnft'],
+                    ['Windows', market === 'reno_sparks' ? '$150\u2013$200/ea' : '$225\u2013$300/ea'],
+                    ['Furnished adder', market === 'reno_sparks' ? '+$0.75/sqft' : '+$1.13/sqft'],
+                    ['Dark color', market === 'reno_sparks' ? '+$0.25/sqft' : '+$0.38/sqft'],
+                  ].map(([label, rate]) => (
+                    <div key={label} className="flex justify-between p-3" style={{ borderBottom: '1px solid #2a2a28' }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#888884' }}>{label}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#fff' }}>{rate}</span>
                     </div>
                   ))}
                 </div>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: '#555552', marginTop: '0.75rem', lineHeight: '1.5' }}>
+                  AI applies these rates + condition multipliers automatically. All rates anchor high — override down as needed.
+                </p>
               </>
             )}
           </div>
@@ -446,9 +491,25 @@ export default function NewQuotePage() {
         {/* Generated quote */}
         {lineItems.length > 0 && (
           <div className="mt-12">
-            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.12em', marginBottom: '1rem' }}>
-              GENERATED QUOTE
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.12em' }}>
+                GENERATED QUOTE
+              </p>
+              <button
+                type="button"
+                onClick={handleStartOver}
+                style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#555552', letterSpacing: '0.1em' }}
+                className="hover:text-white transition-colors"
+              >
+                START OVER
+              </button>
+            </div>
+
+            {hadPhotos && (
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#888884', marginBottom: '1rem', fontStyle: 'italic' }}>
+                Measurements parsed from photos — verify before saving
+              </p>
+            )}
 
             <table className="w-full" style={{ borderCollapse: 'collapse' }}>
               <thead>
