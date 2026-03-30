@@ -52,15 +52,25 @@ model PersonOnProject {
 }
 
 model Quote {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  project   Project  @relation(fields: [projectId], references: [id])
-  projectId String
-  lineItems Json
-  subtotal  Float
-  tax       Float?
-  total     Float
-  notes     String?
+  id                    String       @id @default(cuid())
+  createdAt             DateTime     @default(now())
+  project               Project      @relation(fields: [projectId], references: [id])
+  projectId             String
+  lineItems             Json
+  subtotal              Float
+  tax                   Float?
+  total                 Float
+  notes                 String?
+  status                QuoteStatus  @default(DRAFT)
+  paymentTerms          String?
+  exclusions            String?
+  termsAndConditions    String?
+  signingToken          String?      @unique
+  signingTokenExpiresAt DateTime?
+  signedAt              DateTime?
+  signedPdfPath         String?
+  acceptance            Acceptance?
+  changeOrders          ChangeOrder[]
 }
 
 model PricingBaseline {
@@ -80,6 +90,36 @@ model EpoxyRate {
   @@unique([jobType, systemLevel])
 }
 
+model Acceptance {
+  id               String       @id @default(cuid())
+  signerName       String
+  acceptedAt       DateTime
+  ipAddress        String
+  signaturePngPath String
+  quote            Quote?       @relation(fields: [quoteId], references: [id])
+  quoteId          String?      @unique
+  changeOrder      ChangeOrder? @relation(fields: [changeOrderId], references: [id])
+  changeOrderId    String?      @unique
+}
+
+model ChangeOrder {
+  id                    String            @id @default(cuid())
+  createdAt             DateTime          @default(now())
+  quote                 Quote             @relation(fields: [quoteId], references: [id])
+  quoteId               String
+  description           String
+  lineItems             Json
+  delta                 Float
+  newTotal              Float
+  status                ChangeOrderStatus @default(DRAFT)
+  notes                 String?
+  signingToken          String?           @unique
+  signingTokenExpiresAt DateTime?
+  signedAt              DateTime?
+  signedPdfPath         String?
+  acceptance            Acceptance?
+}
+
 enum ServiceType {
   INTERIOR
   EXTERIOR
@@ -93,6 +133,18 @@ enum ProjectStatus {
   IN_PROGRESS
   COMPLETE
   LOST
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  SIGNED
+}
+
+enum ChangeOrderStatus {
+  DRAFT
+  SENT
+  SIGNED
 }
 
 enum PersonRole {
