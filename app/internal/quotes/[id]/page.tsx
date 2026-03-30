@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import QuoteActions from './QuoteActions'
 
 interface LineItem {
   label: string
@@ -20,13 +21,20 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
   const { id } = await params
   const quote = await db.quote.findUnique({
     where: { id },
-    include: { project: { include: { people: { include: { person: true } } } } },
+    include: {
+      project: { include: { people: { include: { person: true } } } },
+      acceptance: true,
+    },
   })
 
   if (!quote) notFound()
 
   const lineItems = quote.lineItems as unknown as LineItem[]
   const primaryPerson = quote.project.people[0]?.person
+  const status = quote.status ?? 'DRAFT'
+
+  const statusColor =
+    status === 'SIGNED' ? '#4ade80' : status === 'SENT' ? '#facc15' : '#888884'
 
   return (
     <div className="min-h-screen p-8" style={{ background: '#111110', color: '#fff' }}>
@@ -40,19 +48,27 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
           >
             ← Project
           </Link>
-          <button
-            onClick={() => window.print()}
-            style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.1em', border: '1px solid #2a2a28', color: '#888884', padding: '0.4rem 1rem' }}
-            className="hover:border-white hover:text-white transition-colors uppercase"
-          >
-            Print / Save PDF
-          </button>
+          <QuoteActions quoteId={quote.id} status={status} signingToken={quote.signingToken ?? null} />
         </div>
 
-        {/* Quote header */}
+        {/* Proposal header */}
         <div className="mb-10">
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '3.5rem', letterSpacing: '0.03em', lineHeight: '1' }}>
-            ESTIMATE
+          <div className="flex items-baseline gap-4">
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '3.5rem', letterSpacing: '0.03em', lineHeight: '1' }}>
+              PROPOSAL
+            </div>
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.6rem',
+                letterSpacing: '0.12em',
+                color: statusColor,
+                border: `1px solid ${statusColor}`,
+                padding: '0.2rem 0.6rem',
+              }}
+            >
+              {status}
+            </span>
           </div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.12em', marginTop: '0.5rem' }}>
             #{quote.id.slice(-8).toUpperCase()} · {new Date(quote.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -146,6 +162,30 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
 
+        {/* Payment Terms */}
+        {quote.paymentTerms && (
+          <div className="mb-8">
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#888884', letterSpacing: '0.12em', marginBottom: '0.5rem' }}>PAYMENT TERMS</p>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', color: '#888884', lineHeight: '1.7' }}>{quote.paymentTerms}</p>
+          </div>
+        )}
+
+        {/* Exclusions */}
+        {quote.exclusions && (
+          <div className="mb-8">
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#888884', letterSpacing: '0.12em', marginBottom: '0.5rem' }}>EXCLUSIONS</p>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', color: '#888884', lineHeight: '1.7' }}>{quote.exclusions}</p>
+          </div>
+        )}
+
+        {/* Terms & Conditions */}
+        {quote.termsAndConditions && (
+          <div className="mb-8">
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#888884', letterSpacing: '0.12em', marginBottom: '0.5rem' }}>TERMS & CONDITIONS</p>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', color: '#888884', lineHeight: '1.7' }}>{quote.termsAndConditions}</p>
+          </div>
+        )}
+
         {/* Notes */}
         {quote.notes && (
           <div className="mb-8">
@@ -154,9 +194,37 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
           </div>
         )}
 
+        {/* Acceptance info (signed) */}
+        {status === 'SIGNED' && quote.acceptance && (
+          <div
+            className="mb-8 p-6"
+            style={{ border: '1px solid #4ade80', background: 'rgba(74, 222, 128, 0.04)' }}
+          >
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#4ade80', letterSpacing: '0.12em', marginBottom: '0.75rem' }}>ACCEPTED</p>
+            <div style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', lineHeight: '1.7' }}>
+              <div>
+                <span style={{ color: '#888884' }}>Signed by: </span>
+                <span style={{ color: '#fff' }}>{quote.acceptance.signerName}</span>
+              </div>
+              <div>
+                <span style={{ color: '#888884' }}>Date: </span>
+                <span style={{ color: '#fff' }}>
+                  {new Date(quote.acceptance.signedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+              {quote.acceptance.signerIp && (
+                <div>
+                  <span style={{ color: '#888884' }}>IP: </span>
+                  <span style={{ color: '#888884', fontSize: '0.8rem' }}>{quote.acceptance.signerIp}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.08em', lineHeight: '1.8' }}>
-          <p>This estimate is valid for 30 days from issue date.</p>
+          <p>This proposal is valid for 30 days from issue date.</p>
           <p>CPP Painting & Building · (775) 386-3962 · johnny@cpppainting.com · NV Lic. #0071837</p>
         </div>
       </div>
