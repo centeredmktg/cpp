@@ -34,6 +34,16 @@ export default function Hero() {
       className="relative flex flex-col justify-between"
       style={{ minHeight: '100svh', paddingTop: '4rem' }}
     >
+      {/* Background image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/photos/633060646_122189339612438467_3360463541866408099_n.jpg"
+          alt="CPP commercial exterior project"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(17,17,16,0.95) 0%, rgba(17,17,16,0.8) 50%, rgba(17,17,16,0.6) 100%)' }} />
+      </div>
+
       {/* Thin vertical line accent */}
       <div
         className="absolute left-6 top-24 bottom-24 w-px hidden lg:block"
@@ -42,7 +52,7 @@ export default function Hero() {
 
       {/* Main content */}
       <motion.div
-        className="max-w-7xl mx-auto px-6 w-full flex flex-col justify-center flex-1 py-16"
+        className="relative z-10 max-w-7xl mx-auto px-6 w-full flex flex-col justify-center flex-1 py-16"
         variants={container}
         initial="hidden"
         animate="show"
@@ -127,7 +137,7 @@ export default function Hero() {
 
       {/* Service ticker */}
       <div
-        className="overflow-hidden py-4"
+        className="relative z-10 overflow-hidden py-4"
         style={{ borderTop: '1px solid var(--border)' }}
       >
         <div className="ticker-track">

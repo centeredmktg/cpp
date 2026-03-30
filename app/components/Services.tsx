@@ -11,6 +11,7 @@ const services = [
       'Walls, ceilings, trim, and millwork. We work alongside active construction schedules and return-ready timelines. Minimal disruption, maximum coverage.',
     callout: 'To quote: sq ft of walls, sq ft of ceilings, lineal ft of trim',
     type: 'INTERIOR',
+    image: '/photos/632617857_122189295860438467_3954477696704591409_n.jpg',
   },
   {
     id: '02',
@@ -19,6 +20,7 @@ const services = [
       'Full exterior systems including prep, prime, and finish coat. Siding, stucco, fascia, and decks. We handle HOA submittals and color matching.',
     callout: 'To quote: total sq ft of exterior surfaces',
     type: 'EXTERIOR',
+    image: '/photos/632390084_122189339528438467_3852115373374127671_n.jpg',
   },
   {
     id: '03',
@@ -27,6 +29,7 @@ const services = [
       'High-build epoxy and polyaspartic coatings for garages, warehouses, retail, and residential. Prep-to-finish in 1–2 days.',
     callout: 'To quote: sq ft of floor area + concrete condition',
     type: 'EPOXY',
+    image: '/photos/631377960_122189295704438467_6716029063125235686_n.jpg',
   },
 ]
 
@@ -61,6 +64,16 @@ export default function Services() {
               >
                 {s.id}
               </span>
+
+              {/* Photo */}
+              <div className="mt-3 mb-2 overflow-hidden -mx-8" style={{ height: '140px' }}>
+                <img
+                  src={s.image}
+                  alt={s.name}
+                  className="w-full h-full object-cover"
+                  style={{ filter: 'grayscale(20%)' }}
+                />
+              </div>
 
               {/* Name */}
               <h3

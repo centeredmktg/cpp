@@ -41,6 +41,16 @@ export default function About() {
                 </div>
               ))}
             </div>
+
+            {/* Team photo */}
+            <div className="mt-8 overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+              <img
+                src="/photos/632931177_122189295764438467_6153783601955401150_n.jpg"
+                alt="CPP crew on site"
+                className="w-full h-48 object-cover"
+                style={{ filter: 'grayscale(30%)' }}
+              />
+            </div>
           </div>
 
           {/* Right: copy */}

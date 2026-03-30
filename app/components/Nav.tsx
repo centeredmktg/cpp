@@ -31,17 +31,12 @@ export default function Nav() {
       >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex flex-col leading-none group">
-            <span
-              style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', letterSpacing: '0.05em', color: 'var(--fg)' }}
-            >
-              CPP
-            </span>
-            <span
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.15em', color: 'var(--muted)', marginTop: '-2px' }}
-            >
-              PAINTING & BUILDING
-            </span>
+          <a href="#" className="flex items-center">
+            <img
+              src="/photos/logo-bay-area-black.webp"
+              alt="CPP Painting & Building"
+              className="h-10 invert"
+            />
           </a>
 
           {/* Desktop links */}
