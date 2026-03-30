@@ -130,6 +130,8 @@ export default function NewQuotePage() {
     sellPrice: number; directCost: number; overhead: number; profit: number
   } | null>(null)
   const [notes, setNotes] = useState('')
+  const [paymentTerms, setPaymentTerms] = useState('50% deposit due before work begins. Balance due upon completion.')
+  const [exclusions, setExclusions] = useState('')
   const [loading, setLoading] = useState(false)
   const [lineItems, setLineItems] = useState<LineItem[]>([])
   const [error, setError] = useState('')
@@ -214,7 +216,15 @@ export default function NewQuotePage() {
       const res = await fetch('/api/internal/quote/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: id, lineItems, subtotal, total: subtotal, notes }),
+        body: JSON.stringify({
+          projectId: id,
+          lineItems,
+          subtotal,
+          total: subtotal,
+          notes,
+          paymentTerms,
+          exclusions: exclusions || null,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
@@ -350,6 +360,27 @@ export default function NewQuotePage() {
                 />
               </div>
             )}
+
+            <div>
+              <label style={labelStyle}>PAYMENT TERMS</label>
+              <textarea
+                value={paymentTerms}
+                onChange={e => setPaymentTerms(e.target.value)}
+                rows={2}
+                style={{ ...inputStyle, resize: 'vertical' }}
+              />
+            </div>
+
+            <div>
+              <label style={labelStyle}>EXCLUSIONS (OPTIONAL)</label>
+              <textarea
+                value={exclusions}
+                onChange={e => setExclusions(e.target.value)}
+                rows={2}
+                placeholder="Work or materials not included in this quote"
+                style={{ ...inputStyle, resize: 'vertical' }}
+              />
+            </div>
 
             <button
               type="submit"
