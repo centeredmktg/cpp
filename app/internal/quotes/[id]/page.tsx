@@ -209,13 +209,13 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
               <div>
                 <span style={{ color: '#888884' }}>Date: </span>
                 <span style={{ color: '#fff' }}>
-                  {new Date(quote.acceptance.signedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {new Date(quote.acceptance.acceptedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
-              {quote.acceptance.signerIp && (
+              {quote.acceptance.ipAddress && (
                 <div>
                   <span style={{ color: '#888884' }}>IP: </span>
-                  <span style={{ color: '#888884', fontSize: '0.8rem' }}>{quote.acceptance.signerIp}</span>
+                  <span style={{ color: '#888884', fontSize: '0.8rem' }}>{quote.acceptance.ipAddress}</span>
                 </div>
               )}
             </div>

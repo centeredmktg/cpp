@@ -39,7 +39,7 @@ export async function GET(
     return NextResponse.json({ error: 'File not found' }, { status: 404 })
   }
 
-  return new NextResponse(fileBuffer, {
+  return new NextResponse(new Uint8Array(fileBuffer), {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="CPP-Proposal-Signed-${id}.pdf"`,

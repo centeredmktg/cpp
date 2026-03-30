@@ -66,10 +66,10 @@ export async function POST(
 
   const primaryContact = quote.project.people[0]?.person
   const lineItems = quote.lineItems as {
-    description: string
+    label: string
     qty: number
     unit: string
-    unitPrice: number
+    rate: number
     total: number
   }[]
 
@@ -79,23 +79,23 @@ export async function POST(
     serviceType: quote.project.serviceType,
     lineItems,
     subtotal: quote.subtotal,
-    tax: quote.tax ?? undefined,
+    tax: quote.tax ?? null,
     total: quote.total,
-    paymentTerms: quote.paymentTerms ?? undefined,
-    exclusions: quote.exclusions ?? undefined,
-    termsAndConditions: quote.termsAndConditions ?? undefined,
-    notes: quote.notes ?? undefined,
+    paymentTerms: quote.paymentTerms ?? null,
+    exclusions: quote.exclusions ?? null,
+    termsAndConditions: quote.termsAndConditions ?? null,
+    notes: quote.notes ?? null,
     clientName: primaryContact?.name ?? signerName,
-    clientCompany: primaryContact?.company ?? undefined,
-    clientEmail: primaryContact?.email ?? undefined,
-    clientPhone: primaryContact?.phone ?? undefined,
+    clientCompany: primaryContact?.company ?? null,
+    clientEmail: primaryContact?.email ?? null,
+    clientPhone: primaryContact?.phone ?? null,
     projectName: quote.project.name,
   }
 
   const html = renderProposalHtml(proposalData)
 
   const signedPdfPath = path.join(DOCS_DIR, `${token}-signed.pdf`)
-  await generateSignedPDF({ html, signaturePngPath: sigPngPath, outputPath: signedPdfPath })
+  await generateSignedPDF(html, signedPdfPath, signature)
 
   const acceptedAt = new Date()
 

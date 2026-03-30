@@ -98,7 +98,7 @@ export async function POST(
   const html = renderChangeOrderHtml(changeOrderData)
 
   const signedPdfPath = path.join(DOCS_DIR, `co-${token}-signed.pdf`)
-  await generateSignedPDF({ html, signaturePngPath: sigPngPath, outputPath: signedPdfPath })
+  await generateSignedPDF(html, signedPdfPath, signature)
 
   const acceptedAt = new Date()
 
