@@ -78,11 +78,11 @@ export default function Hero() {
             maxWidth: '900px',
           }}
         >
-          Production-Grade
+          Northern Nevada&apos;s Premier
           <br />
-          Painting &
+          Paint & Epoxy
           <br />
-          <span style={{ color: 'var(--muted)' }}>Epoxy Floors.</span>
+          <span style={{ color: 'var(--muted)' }}>Floor Provider.</span>
         </motion.h1>
 
         {/* Subheading */}
