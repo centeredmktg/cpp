@@ -23,7 +23,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     where: { id },
     include: {
       people: { include: { person: true } },
-      quotes: { orderBy: { createdAt: 'desc' } },
+      quotes: {
+        orderBy: { createdAt: 'desc' },
+        include: {
+          changeOrders: { orderBy: { createdAt: 'desc' } },
+          acceptance: true,
+        },
+      },
     },
   })
 
@@ -156,6 +162,73 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 </Link>
               ))
             )}
+
+          {/* Change Orders */}
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.12em' }}>
+                CHANGE ORDERS
+              </p>
+              {project.quotes.some(q => q.status === 'SIGNED') && (
+                <Link
+                  href={`/internal/projects/${project.id}/change-order/new`}
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.1em', color: '#fff', border: '1px solid #2a2a28', padding: '0.3rem 0.75rem' }}
+                  className="hover:border-white transition-colors uppercase"
+                >
+                  + New Change Order
+                </Link>
+              )}
+            </div>
+
+            {(() => {
+              const allCOs = project.quotes.flatMap(q => q.changeOrders.map(co => ({ ...co, quoteTotal: q.total })))
+              if (allCOs.length === 0) {
+                return (
+                  <div className="p-6 text-center" style={{ border: '1px dashed #2a2a28' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#888884' }}>No change orders</span>
+                  </div>
+                )
+              }
+
+              const signedQuote = project.quotes.find(q => q.status === 'SIGNED')
+              const signedCODeltas = allCOs.filter(co => co.status === 'SIGNED').reduce((sum, co) => sum + co.delta, 0)
+              const currentValue = (signedQuote?.total ?? 0) + signedCODeltas
+
+              return (
+                <>
+                  {allCOs.map(co => (
+                    <div key={co.id} className="p-4 mb-2" style={{ border: '1px solid #2a2a28' }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#888884' }}>
+                          {new Date(co.createdAt).toLocaleDateString()}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: co.status === 'SIGNED' ? '#4ade80' : '#888884', letterSpacing: '0.1em' }}>
+                            {co.status}
+                          </span>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: co.delta >= 0 ? '#fff' : '#f87171' }}>
+                            {co.delta >= 0 ? '+' : '-'}${Math.abs(co.delta).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.8rem', color: '#888884' }}>
+                        {co.description}
+                      </p>
+                    </div>
+                  ))}
+
+                  {signedQuote && (
+                    <div className="mt-3 p-4" style={{ background: '#1c1c1a', border: '1px solid #2a2a28' }}>
+                      <div className="flex justify-between items-center">
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.1em' }}>CURRENT PROJECT VALUE</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.1rem', color: '#fff' }}>${currentValue.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )
+            })()}
+          </div>
           </div>
         </div>
       </div>
