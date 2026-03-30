@@ -1,7 +1,7 @@
 // app/components/IntakeDropzone.tsx
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 interface AttachedFile {
   name: string
@@ -73,9 +73,20 @@ export default function IntakeDropzone({ text, onTextChange, files, onFilesChang
   const handleDragLeave = useCallback(() => setDragOver(false), [])
 
   const removeFile = useCallback((index: number) => {
+    if (files[index]?.preview) {
+      URL.revokeObjectURL(files[index].preview!)
+    }
     const updated = files.filter((_, i) => i !== index)
     onFilesChange(updated)
   }, [files, onFilesChange])
+
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      files.forEach(f => { if (f.preview) URL.revokeObjectURL(f.preview) })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only on unmount
 
   return (
     <div className="flex flex-col gap-3">

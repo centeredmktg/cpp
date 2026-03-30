@@ -1,6 +1,6 @@
 // lib/pricing-prompt.ts
 
-type Market = 'reno_sparks' | 'arrowcreek' | 'tahoe'
+export type Market = 'reno_sparks' | 'arrowcreek' | 'tahoe'
 
 const MARKET_LABELS: Record<Market, string> = {
   reno_sparks: 'Reno / Sparks',
@@ -12,7 +12,7 @@ export function buildPricingPrompt(serviceType: 'INTERIOR' | 'EXTERIOR', market:
   const marketLabel = MARKET_LABELS[market]
   const isHighMarket = market === 'arrowcreek' || market === 'tahoe'
   const marketNote = isHighMarket
-    ? 'This is a premium market — apply 50% increase on ALL rates below.'
+    ? 'This is a premium market. Rates below already reflect the market adjustment.'
     : ''
 
   return `You are a painting contractor estimating assistant for CPP Painting & Building, based in Northern Nevada.
