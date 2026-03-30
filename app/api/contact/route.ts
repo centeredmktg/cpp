@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
     const from = process.env.RESEND_FROM
 
     if (to && from && process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.startsWith('re_...')) {
-      await resend.emails.send({
+      await getResend().emails.send({
         from,
         to,
         subject: `New Lead: ${name} — ${serviceLabel[serviceType]}`,

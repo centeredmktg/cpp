@@ -3,7 +3,9 @@ import 'server-only'
 import { Resend } from 'resend'
 import { readFileSync } from 'fs'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 const FROM = process.env.RESEND_FROM ?? 'CPP Painting & Building <noreply@cpppainting.com>'
 const BCC = process.env.RESEND_BCC ?? undefined
@@ -42,7 +44,7 @@ export async function sendSigningLink(opts: {
   const firstName = opts.toName.split(' ')[0]
   const label = opts.documentType === 'proposal' ? 'Proposal' : 'Change Order'
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: opts.toEmail,
     bcc: BCC,
@@ -61,7 +63,7 @@ export async function sendSignedPDF(opts: {
   const label = opts.documentType === 'proposal' ? 'Proposal' : 'Change Order'
   const pdfBuffer = readFileSync(opts.signedPdfPath)
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: opts.toEmail,
     bcc: BCC,
