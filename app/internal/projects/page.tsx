@@ -1,6 +1,8 @@
 import { db } from '@/lib/db'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 const COLUMNS = [
   { key: 'LEAD', label: 'Lead' },
   { key: 'QUOTED', label: 'Quoted' },

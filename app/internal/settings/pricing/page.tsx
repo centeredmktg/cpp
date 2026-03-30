@@ -3,6 +3,8 @@ import PricingEditor from './PricingEditor'
 import EpoxyRatesEditor from './EpoxyRatesEditor'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default async function PricingPage() {
   const [baselines, epoxyRates] = await Promise.all([
     db.pricingBaseline.findMany({ orderBy: { key: 'asc' } }),
