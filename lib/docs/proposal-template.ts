@@ -77,7 +77,7 @@ export function renderProposalHtml(data: ProposalData): string {
   <!-- Header -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #ddd;">
     <div>
-      <h1 style="margin:0;font-size:20px;font-weight:700;">CPP Painting & Building</h1>
+      <h1 style="margin:0;font-size:20px;font-weight:700;">CPP Painting & Construction</h1>
       <p style="color:#888;font-size:12px;margin:4px 0 0;">Johnny Avila &middot; (775) 386-3962 &middot; NV Lic. #0071837</p>
     </div>
     <div style="text-align:right;">
@@ -90,7 +90,7 @@ export function renderProposalHtml(data: ProposalData): string {
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid #ddd;">
     <div>
       <p class="label">FROM</p>
-      <p style="font-weight:600;margin:0;">CPP Painting & Building</p>
+      <p style="font-weight:600;margin:0;">CPP Painting & Construction</p>
       <p style="color:#888;font-size:13px;margin:2px 0 0;">Johnny Avila</p>
       <p style="color:#888;font-size:13px;margin:2px 0 0;">(775) 386-3962</p>
       <p style="color:#888;font-size:13px;margin:2px 0 0;">NV Lic. #0071837</p>
@@ -174,7 +174,7 @@ export function renderProposalHtml(data: ProposalData): string {
 
   <!-- Signature area (replaced by actual signature in signed PDF) -->
   <div style="margin-top:48px;padding-top:24px;border-top:1px solid #ddd;">
-    <p style="font-size:12px;color:#888;">By signing below, you authorize CPP Painting & Building to proceed with the above scope and agree to the stated terms.</p>
+    <p style="font-size:12px;color:#888;">By signing below, you authorize CPP Painting & Construction to proceed with the above scope and agree to the stated terms.</p>
   </div>
 </body>
 </html>`

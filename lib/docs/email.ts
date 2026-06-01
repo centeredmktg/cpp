@@ -7,7 +7,7 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY)
 }
 
-const FROM = process.env.RESEND_FROM ?? 'CPP Painting & Building <noreply@cpppainting.com>'
+const FROM = process.env.RESEND_FROM ?? 'CPP Painting & Construction <noreply@cpppainting.com>'
 const BCC = process.env.RESEND_BCC ?? undefined
 
 function signingLinkHtml(
@@ -28,7 +28,7 @@ function signingLinkHtml(
   <p style="color:#888;font-size:13px;">This link expires in 30 days.</p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
   <p style="color:#888;font-size:12px;">
-    CPP Painting &amp; Building<br/>
+    CPP Painting &amp; Construction<br/>
     (775) 386-3962
   </p>
 </div>`
@@ -48,7 +48,7 @@ export async function sendSigningLink(opts: {
     from: FROM,
     to: opts.toEmail,
     bcc: BCC,
-    subject: `${label} from CPP Painting & Building — ${opts.projectName}`,
+    subject: `${label} from CPP Painting & Construction — ${opts.projectName}`,
     html: signingLinkHtml(firstName, opts.projectName, opts.signingUrl, opts.documentType),
   })
 }
@@ -74,7 +74,7 @@ export async function sendSignedPDF(opts: {
   <p>We look forward to working with you.</p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
   <p style="color:#888;font-size:12px;">
-    CPP Painting &amp; Building<br/>
+    CPP Painting &amp; Construction<br/>
     (775) 386-3962
   </p>
 </div>`,

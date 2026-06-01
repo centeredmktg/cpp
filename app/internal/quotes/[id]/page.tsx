@@ -80,7 +80,7 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
           <div>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#888884', letterSpacing: '0.12em', marginBottom: '0.75rem' }}>FROM</p>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', lineHeight: '1.7' }}>
-              <div style={{ fontWeight: 600 }}>CPP Painting & Building</div>
+              <div style={{ fontWeight: 600 }}>CPP Painting & Construction</div>
               <div style={{ color: '#888884' }}>Johnny Avila</div>
               <div style={{ color: '#888884' }}>(775) 386-3962</div>
               <div style={{ color: '#888884' }}>NV Lic. #0071837</div>
@@ -225,7 +225,7 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
         {/* Footer */}
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.08em', lineHeight: '1.8' }}>
           <p>This proposal is valid for 30 days from issue date.</p>
-          <p>CPP Painting & Building · (775) 386-3962 · johnny@cpppainting.com · NV Lic. #0071837</p>
+          <p>CPP Painting & Construction · (775) 386-3962 · johnny@cpppainting.com · NV Lic. #0071837</p>
         </div>
       </div>
     </div>

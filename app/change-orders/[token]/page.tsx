@@ -31,7 +31,7 @@ export default async function ChangeOrderPage({ params }: { params: Promise<{ to
         <div className="text-center">
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem' }}>Link Expired</h1>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#888884', marginTop: '0.5rem' }}>
-            This signing link has expired. Please contact CPP Painting & Building for a new link.
+            This signing link has expired. Please contact CPP Painting & Construction for a new link.
           </p>
         </div>
       </div>
@@ -60,7 +60,7 @@ export default async function ChangeOrderPage({ params }: { params: Promise<{ to
           <div>
             <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#888884', letterSpacing: '0.12em', marginBottom: '0.75rem' }}>FROM</p>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', lineHeight: '1.7' }}>
-              <div style={{ fontWeight: 600 }}>CPP Painting & Building</div>
+              <div style={{ fontWeight: 600 }}>CPP Painting & Construction</div>
               <div style={{ color: '#888884' }}>Johnny Avila</div>
               <div style={{ color: '#888884' }}>(775) 386-3962</div>
               <div style={{ color: '#888884' }}>NV Lic. #0071837</div>
@@ -137,7 +137,7 @@ export default async function ChangeOrderPage({ params }: { params: Promise<{ to
 
         <div className="mb-8 print:mb-0" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: '#888884', letterSpacing: '0.08em', lineHeight: '1.8' }}>
           <p>This change order is valid for 30 days from issue date.</p>
-          <p>CPP Painting & Building &middot; (775) 386-3962 &middot; NV Lic. #0071837</p>
+          <p>CPP Painting & Construction &middot; (775) 386-3962 &middot; NV Lic. #0071837</p>
         </div>
 
         <ChangeOrderSigningBlock
