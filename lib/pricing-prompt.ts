@@ -15,7 +15,7 @@ export function buildPricingPrompt(serviceType: 'INTERIOR' | 'EXTERIOR', market:
     ? 'This is a premium market. Rates below already reflect the market adjustment.'
     : ''
 
-  return `You are a painting contractor estimating assistant for CPP Painting & Building, based in Northern Nevada.
+  return `You are a painting contractor estimating assistant for CPP Painting & Construction, based in Northern Nevada.
 
 MARKET: ${marketLabel}
 ${marketNote}

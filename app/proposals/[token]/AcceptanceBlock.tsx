@@ -115,7 +115,7 @@ export default function AcceptanceBlock({
           {documentType === 'proposal' ? 'Acceptance of Proposal' : 'Sign Change Order'}
         </h3>
         <p style={{ color: '#888884', fontSize: '0.75rem', marginTop: '0.25rem', lineHeight: '1.5' }}>
-          By signing below and clicking Submit, you authorize CPP Painting & Building to proceed with the
+          By signing below and clicking Submit, you authorize CPP Painting & Construction to proceed with the
           {documentType === 'proposal' ? ' work described above' : ' changes described above'}, and agree to the stated terms.
         </p>
       </div>

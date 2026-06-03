@@ -13,7 +13,7 @@ export default function Footer() {
             <div
               style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.15em', color: 'var(--muted)', marginTop: '2px' }}
             >
-              PAINTING & BUILDING
+              PAINTING & CONSTRUCTION
             </div>
           </div>
 
@@ -51,7 +51,7 @@ export default function Footer() {
         <p
           style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--border)', letterSpacing: '0.08em', marginTop: '3rem' }}
         >
-          © {new Date().getFullYear()} CPP Painting & Building. All rights reserved.
+          © {new Date().getFullYear()} CPP Painting & Construction. All rights reserved.
         </p>
       </div>
     </footer>

@@ -21,7 +21,7 @@ const barlow = Barlow({
 });
 
 export const metadata: Metadata = {
-  title: "CPP Painting & Building | Reno, NV",
+  title: "CPP Painting & Construction | Reno, NV",
   description:
     "Production-grade interior painting, exterior painting, and epoxy floors in Reno, NV. Licensed and insured.",
 };

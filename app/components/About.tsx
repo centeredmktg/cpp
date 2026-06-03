@@ -56,7 +56,7 @@ export default function About() {
           {/* Right: copy */}
           <div className="flex flex-col gap-5">
             <p style={{ fontFamily: 'var(--font-sans)', fontSize: '1rem', color: 'var(--muted)', lineHeight: '1.8' }}>
-              CPP Painting & Building has been operating in the Reno market for over 15 years. We built our reputation on volume production work — apartment turns, new construction phases, and commercial interiors — where schedule reliability and consistent quality matter more than anything else.
+              CPP Painting & Construction has been operating in the Reno market for over 15 years. We built our reputation on volume production work — apartment turns, new construction phases, and commercial interiors — where schedule reliability and consistent quality matter more than anything else.
             </p>
             <p style={{ fontFamily: 'var(--font-sans)', fontSize: '1rem', color: 'var(--muted)', lineHeight: '1.8' }}>
               Johnny Avila holds the qualifying license and is on every job. We&apos;re not a general contractor with subs — we self-perform all painting and epoxy work with our own crews. That&apos;s what keeps callbacks near zero.

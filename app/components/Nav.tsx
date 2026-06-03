@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Logo from './Logo'
 
 const links = [
   { label: 'Services', href: '#services' },
@@ -29,14 +30,10 @@ export default function Nav() {
           backdropFilter: scrolled ? 'blur(8px)' : 'none',
         }}
       >
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center">
-            <img
-              src="/photos/logo-bay-area-black.webp"
-              alt="CPP Painting & Building"
-              className="h-10 invert"
-            />
+            <Logo variant="light" height={75} />
           </a>
 
           {/* Desktop links */}
